@@ -48,6 +48,11 @@ labels = torch.rand(1, 1000)
 
 Running input through each layer
 
+In a forward pass, autograd does two things simultaneously:
+
+* run the requested operation to compute a resulting tensor, and
+* maintain the operation’s gradient function in the DAG (directed acyclic graph).
+
 ```
 prediction = model(data)
 ```
@@ -55,6 +60,12 @@ prediction = model(data)
 ##### **Backward Pass**
 
 **Calculating loss:** Using model prediction and original label
+
+The backward pass kicks off when `.backward()` is called on the DAG root. autograd then:
+
+* computes the gradients from each `.grad_fn`,
+* accumulates them in the respective tensor’s `.grad` attribute, and
+* using the chain rule, propagates all the way to the leaf tensors.
 
 ```
 loss = (prediction - labels).sum()
@@ -81,3 +92,33 @@ Finally, we call `.step()` to initiate gradient descent.
 ```
 optim.step()
 ```
+
+##### `frozen parameters`
+
+Parameters that don’t compute gradients
+
+Why freeze?
+
+- most of the model and typically only modify the classifier layers to make predictions on new labels. 
+
+##### **Finetuning the model**
+
+Model - 10 labels
+
+Classifier in last layer - `model.fc`
+
+Last layer - Replacing it with new linear layer (unfrozen by default)
+
+
+
+```
+model.fc = nn.Linear(512, 10)
+```
+
+We find that all the layers are frozen except the last layer ( `model.fc` ). Only parameters of last layer are used to compute weights and bias `gradients`.
+
+```
+optimizer = optim.SGD(model.parameters(), lr=1e-2, momentum=0.9)
+```
+
+
