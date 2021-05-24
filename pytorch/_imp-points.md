@@ -9,7 +9,7 @@
 * `forward`: specify how it will move
 
 ```
-**Note:** to(device)- specifies ehich device to use for tensors in pytorch
+**Note:** to(device)- specifies which device to use for tensors in pytorch
 ```
 
 #### **Loss Function & Optimization**
@@ -18,10 +18,62 @@
 
 #### **Training & Testing**
 
-#### **Save Model**: `torch.save(model.state_dict(), "model.pth")`
+#### **Save Model**
+
+1) Saving and Loading Model
+
+`torch.save(model.state_dict(), "model.pth")`: Store the learned parameters as an internal state dictionary
+
+To load the model weights ------ i) Create the instance of the same model, ii) Load parameters using `load_state_dict()` method
+
+```
+model.load_state_dict(torch.load('model.pth'))
+model.eval()
+```
+> *Note:* Call `model.eval()` before calling dropout and normalization layers
+
+2) Saving and Loading Model with Shapes
+
+Used when we want to first save structure of class (class defines structure of network). This module uses python `pickel` module.
+
+```
+torch.save(model, 'model.pth')
+model = torch.load('model.pth')
+```
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+### **Datasets and DataLoaders**
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+### **Tansforms**
+
+`transform`: To modify the features.
+
+`traget_transform`: To modify the labels.
+
+Example: FashionMNIST Datasets
+
+- features are in PIL image format ----------- Required as normalized tensors
+- labels are integers ----------- Required as one-hot encoded tensors
+
+Therefore use:
+
+- `ToTensor()`: converts a PIL image or NumPy ndarray into a FloatTensor...........Scales image intensity pixels in range [0., 1.]
+- `Lambda Transforms`: They are user definid lambda function which converts integer values to one-hot-encoded tensors
+
+```
+target_transform = Lambda(lambda y: torch.zeros(
+    10, dtype=torch.float).scatter_(dim=0, index=torch.tensor(y), value=1))
+```
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
 ### **Neural Networks**
+
+`torch.nn`: Used to create neural networks
 
 `torch.autograd`: automatic differentiation engine
 
